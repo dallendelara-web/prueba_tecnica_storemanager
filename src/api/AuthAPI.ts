@@ -7,7 +7,6 @@ export const loginAPI = async (
     username: string, 
     password: string
 ): Promise<LoginResponse> => {
-    // Real backend implementation
     try {
         const url = API_URL_BASE + '/login'
         const body = {
