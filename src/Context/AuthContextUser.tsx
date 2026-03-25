@@ -121,27 +121,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
 
   const refreshUserData = async (perfilId: string) => {
     try {
-      const { getPerfilDataAPI } = await import('../api/AuthAPI');
-      const response = await getPerfilDataAPI(perfilId);
       
-      if (response?.data) {
-        const datosAsigns = await setAsignacionDatosFunc(response.data.asignaciones_datos);
-        const datosPerfilVistas = await setPerfilVistasFunc(response.data.perfil_vistas);
-        
-        // Actualizar el user actual con los nuevos datos
-        const updatedUser = {
-          ...user,
-          asignaciones_datos: response.data.asignaciones_datos,
-          perfil_vistas: response.data.perfil_vistas
-        };
-        
-        setUser(updatedUser);
-        setAsignacionDatos(JSON.stringify(datosAsigns));
-        setPerfilVistas(JSON.stringify(datosPerfilVistas));
-        localStorage.setItem('asignacionDatos', JSON.stringify(datosAsigns));
-        localStorage.setItem('perfilVistas', JSON.stringify(datosPerfilVistas));
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-      }
     } catch (error) {
       console.error('Error al actualizar datos del usuario:', error);
     }

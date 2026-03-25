@@ -1,0 +1,23 @@
+.submit-button{
+    background-color: #27F5A3 !important;
+    border-radius: 60px !important;
+    color: #FFFFFF !important;
+    filter: drop-shadow(5px 5px 0.30rem rgba(69, 69, 69, 0.6)) !important;
+    border: 0;
+    transition: background-color 0.3s, transform 0.2s !important;
+    font-weight: bold;
+}
+
+.sb-disabled{
+    background-color: #FFFFFF !important;
+    color: rgb(34, 156, 121) !important;
+}
+
+.submit-button:hover {
+    background-color: #454545!important;
+}
+
+.submit-button:active {
+    /* transform: scale(0.95) !important; */
+    box-shadow: 0 0 30px #27F5A3 !important;
+}

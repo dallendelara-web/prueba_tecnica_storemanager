@@ -1,0 +1,5 @@
+.bg-gradient-27F5A3{
+    padding: calc(var(--spacing) * 12);
+    background: #27F5A3;
+    background: linear-gradient(90deg, rgb(34, 156, 121) 0%, rgb(39, 245, 163) 100%);
+}
