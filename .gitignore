@@ -14,10 +14,10 @@ dist
 dist-ssr
 *.local
 
-# Environment variables
-.env
-.env.local
-.env.*.local
+# Environment variables por esta ocación, se sube al repo
+# .env
+# .env.local
+# .env.*.local
 
 # Editor directories and files
 .vscode/*

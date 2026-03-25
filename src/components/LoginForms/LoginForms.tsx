@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import React, { useRef, useEffect } from 'react';
 import { useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
+import { useStore } from "@/store/useStore";
 
 import "./styles.css"
 import userLogin from '@/assets/ecolana-white.png';
@@ -12,9 +13,18 @@ import {
 import type { LoginType } from '@/types/User';
 import  PasswordInput from '@/components/Inputs/PasswordInput';
 import  SubmitButton from '@/components/Buttons/SubmitButton';
+import  InvalidInputAlert from '@/components/Alerts/InvalidInputAlert';
 import { IsEmpty } from '@/helpers/ValidateValue';
+import { useAuth } from "@/Context/AuthContextUser";
 
 const LoginForms = ()=> {
+    const navigate = useNavigate();
+    const { login, user } = useAuth();
+    const { logIN, isLoadingLogin, loggedUserError } = useStore();
+
+    const handleNavigate = (route: string): void => {
+        navigate(route);
+    };
 
     const [formDataLogin, setFormDataLogin] = useState<LoginType>({
         username: '',
@@ -28,6 +38,14 @@ const LoginForms = ()=> {
         !res ? setIsDisabled(true) : setIsDisabled(false);
     }, [formDataLogin]);
 
+    useEffect(() => {
+        isLoadingLogin ? setIsDisabled(true) : !isLoadingLogin && (Object.keys(errors).length > 0) == false ? setIsDisabled(true) : setIsDisabled(false);
+    }, [isLoadingLogin]);
+
+    useEffect(() => {
+        user?.id ? handleNavigate("/") : null;
+    }, [user]);
+
     const validateFields = () => {
         const newErrors: { [key: string]: boolean } = {};
 
@@ -39,8 +57,13 @@ const LoginForms = ()=> {
     };
 
 
-    const handleLogin = ()=> {
-
+    const handleLogin = async()=> {
+        const res = await logIN(formDataLogin.username, formDataLogin.password);
+        console.log("RESULTADO FRONT");
+        console.log(res);
+        if(res?.success){
+            login(res?.data);
+        }
     }
 
     return(
@@ -94,6 +117,14 @@ const LoginForms = ()=> {
                         Value={formDataLogin.password}
                         setValue={(e) => setFormDataLogin({ ...formDataLogin, password: e })}
                     />
+                    {
+                        loggedUserError ?
+                            <InvalidInputAlert
+                                Title={loggedUserError ?? ""}
+                            />
+                        :
+                            null
+                    }
                     <SubmitButton
                         OnSubmit={handleLogin}
                         Label={"Entrar"}

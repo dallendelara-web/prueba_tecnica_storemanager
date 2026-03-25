@@ -1,11 +1,22 @@
 import axios, { type AxiosRequestConfig } from "axios";
+import Config from '../constants/config';
 
 // Configura la instancia de axios
 const apiClient = axios.create({
-  baseURL: "", // Cambia esta URL a la base de tu API
+  baseURL: Config?.urlBase, // Cambia esta URL a la base de tu API
   timeout: 10000, // Tiempo de espera opcional
   headers: {
     "Content-Type": "application/json",
+  },
+});
+
+const apiClientMulti = axios.create({
+  baseURL: Config?.urlBase,
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'POST, GET, PUT, DELETE, OPTIONS, HEAD, Authorization, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Allow-Origin',
+    'Accept': 'application/json',
+    'Content-Type': 'multipart/form-data',
   },
 });
 
@@ -61,14 +72,53 @@ const httpRequest = async (
     const response = await apiClient(config);
     console.log("✅ Respuesta recibida:", response.status);
     console.log("📦 Datos recibidos:", response.data);
-    return response.data;
+    return response;
   } catch (error: any) {
     console.error(`Error en la Solicitud ${method} a: ${url}`, error);
     if (error.response) {
       console.error("Respuesta de error:", error.response);
       console.error("📛 Mensaje del backend:", error.response.data?.message || error.response.data);
       console.error("📛 Status:", error.response.status, error.response.statusText);
+      // Retornar el objeto completo de error del backend
+      return error.response.data;
     }
+    throw error;
+  }
+};
+
+const httpRequestMulti = async ( 
+  method: AxiosRequestConfig['method'], 
+  url:string, data = {}, 
+  requiresAuth = false
+) => {
+  interface Config {
+    method:  AxiosRequestConfig['method'];
+    url: string;
+    data?: any; // Este campo puede ser opcional si no se usa en todas las solicitudes
+    headers?: { [key: string]: string }
+  }
+
+  const config:Config = {
+    method: method,
+    url: url,
+    data: method !== 'GET' ? data : undefined,
+  };
+
+  if (requiresAuth) {
+    const token = await obtenerToken(); 
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
+  }
+
+  try {
+    const response = await apiClientMulti(config);
+    return response.data;
+  } catch (error:any) {
+    //console.error('Error en la solicitud HTTP:', error.response.data);
     throw error;
   }
 };
@@ -159,4 +209,12 @@ const deleteRequest = (url: string, requiresAuth = false, headers = {}) => {
   return httpRequest("DELETE", url, {}, requiresAuth, headers);
 };
 
-export { deleteRequest, getRequest, postRequest, putRequest, patchRequest };
+const postRequestMulti = (url:string, data:any, requiresAuth = false) => {
+  return httpRequestMulti('POST', url, data, requiresAuth);
+};
+
+const putRequestMulti = (url:string, data:any, requiresAuth = false) => {
+  return httpRequestMulti('PUT', url, data, requiresAuth);
+};
+
+export { deleteRequest, getRequest, postRequest, putRequest, patchRequest, postRequestMulti, putRequestMulti };

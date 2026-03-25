@@ -15,7 +15,7 @@ const SubmitButton = ({
     return(
         <Button
             className={IsDisabled ? "submit-button sb-disabled" : "submit-button"}
-            type="submit"
+            //type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 8, mb: 2 }}

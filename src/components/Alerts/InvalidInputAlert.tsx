@@ -8,7 +8,10 @@ const InvalidInputAlert = ({
     Description
 }: InvalidInputAlertType)=>{
     return(
-        <Alert variant="destructive">
+        <Alert 
+            variant="destructive"
+            className="bg-red-200"
+        >
             <AlertCircleIcon  />
             <AlertTitle>{Title ?? "Alerta"}</AlertTitle>
             <AlertDescription>
