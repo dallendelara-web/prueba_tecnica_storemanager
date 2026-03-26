@@ -1,9 +1,11 @@
 import { createBrowserRouter } from "react-router";
 
 import PrivateRoute from "./routerComponents/PrivateRoute";
-import LogIn from "@/app/auth/LoginPage";
 import AuthLayout from "@/layouts/AuthLayout";
+import LogIn from "@/app/auth/LoginPage";
+import MainAppLayout from "@/layouts/MainAppLayout";
 import HomePage from "@/app/main/HomePage";
+import UsersCarts from "@/app/main/UsersCarts";
 
 const router = createBrowserRouter([
   // ------- EJEMPLO DE LA DEFINICIÓN DE RUTAS CON REACT ROUTER v6
@@ -32,17 +34,24 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    Component: AuthLayout,
+    Component: MainAppLayout,
     children: [
       { 
         index: true, 
         element: (
-        <PrivateRoute>
-          <HomePage />
-        </PrivateRoute>
-      ) 
+          <PrivateRoute>
+            <HomePage />
+          </PrivateRoute>
+        ) 
       },
-      //{ path: "/admin/perfiles", element: (<PrivateRoute><GestionPerfiles /></PrivateRoute>) },
+      { 
+        path: "/users/carts", 
+        element: (
+          <PrivateRoute>
+            <UsersCarts />
+          </PrivateRoute>
+        ) 
+      },
     ],
   },
 ]);

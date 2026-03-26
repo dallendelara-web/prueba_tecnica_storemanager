@@ -127,7 +127,7 @@ const httpRequestMulti = async (
 const obtenerToken = (): string | null => {
   try {
     // Primero intentar obtener el token directamente
-    let token = localStorage.getItem("token");
+    let token = localStorage.getItem("refreshToken");
     if (token) {
       // Limpiar el token de espacios y comillas
       token = token.trim().replace(/^["']|["']$/g, '');

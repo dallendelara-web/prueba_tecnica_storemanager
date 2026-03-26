@@ -17,3 +17,30 @@ export interface SubmitButtonType {
   OnSubmit: (value: any) => void;
   IsDisabled: boolean;
 }
+
+export interface FilterComponentProps {
+  search: string;
+  setSearch: (search: string) => void;
+  searchPlaceholder?: string;
+  actions?: React.ReactNode;
+}
+
+export interface HeaderProps {
+  title: string;
+  subtitle?: string;
+  headerActions?: React.ReactNode;
+}
+
+export interface ProductCardProps {
+  nombre: string;
+  description?: string;
+  categoria: string;
+  precioBase: number;
+  stockTotal: number;
+  descuento?: number;
+  disponiblidad: "En venta" | "Descontinuado"
+  variantes: [],
+  rating?: number;
+  thumbnail?: string;
+  onEdit: () => void
+}

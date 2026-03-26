@@ -8,7 +8,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     primary: {
       main: '#fff',
     },
