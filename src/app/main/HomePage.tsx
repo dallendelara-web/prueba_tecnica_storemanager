@@ -7,11 +7,14 @@ import { useStore } from "@/store/useStore";
 
 import { 
     Plus,
-    Filter
+    Filter,
+    ArrowUpWideNarrow
 } from "lucide-react";
 
 import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
+import { IsEmpty } from '@/helpers/ValidateValue';
+import { useDebounce } from '@/hooks/UseDebunce'; 
+import { sortNumeric, sortString } from '@/helpers/FilterArray';
 
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header/Header";
@@ -24,11 +27,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import WatingData from "@/components/LottieAnimations/WatingData";
+import NotDataFound from "@/components/LottieAnimations/NotDataFound";
 import ProductCard from "@/components/Cards/ProductCard";
 
 const HomePage = () => {
     const { user } = useAuth();
     const { getProductsList, isLoadingGetProductsList, getProductsListError, getProductsListSuccess } = useStore();
+    const { getProductsByCategory, getProductsByCategoryError, isLoadingGetProductsByCategory } = useStore();
 
     const [productsList, setProductsList] = useState([]);
     const [totalDocs, setTotalDocs] = useState(0);
@@ -36,7 +41,8 @@ const HomePage = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [search, setSearch] = useState("");
-    const [filterData, setFilterData] = useState<string>("categoria");
+    const [filterData, setFilterData] = useState<string>("");
+    const debouncedSearchTerm = useDebounce(search, 300);
 
     useEffect(() => {
         if(user?.id){
@@ -48,6 +54,9 @@ const HomePage = () => {
         if(getProductsListSuccess?.data?.products?.length > 0){
             setTotalDocs(getProductsListSuccess?.data?.total)
             setProductsList(getProductsListSuccess?.data?.products);
+        }else{
+            setTotalDocs(0)
+            setProductsList([]);
         }
     }, [getProductsListSuccess]);
 
@@ -58,10 +67,41 @@ const HomePage = () => {
         }
     }, [totalDocs]);
 
+    useEffect(() => {
+        if (IsEmpty(search.trim())) {
+            getProductsList(limit?.toString(), "0");
+        } else {
+            
+        }
+    }, [search]); 
+
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            if (IsEmpty(search.trim())) {
+                getProductsList(limit?.toString(), "0");
+            } else {
+                getProductsByCategory(search.trim(), limit?.toString(), "0")
+            }
+        }
+    }, [debouncedSearchTerm]);
+
+    useEffect(() => {
+        if(filterData == "precio"){
+            setProductsList(sortNumeric(productsList, "price"));
+        }
+        if(filterData == "rating"){
+            setProductsList(sortNumeric(productsList, "rating"));
+        }
+    }, [filterData]);
+
     const handleChange = (event, value) => {
         const skipt = value == 1 ? 0 : limit * (value-1);
         setPage(value);
-        getProductsList(limit?.toString(), skipt.toString());
+        if (IsEmpty(search.trim())){
+            getProductsList(limit?.toString(), skipt.toString());
+        }else{
+            getProductsByCategory(search.trim(), limit?.toString(), skipt.toString())
+        }
     };
 
     return(
@@ -89,12 +129,12 @@ const HomePage = () => {
                     <div className="flex flex-row gap-x-2">
                         <Select value={filterData || "folio"} onValueChange={setFilterData}>
                         <SelectTrigger className="w-[180px] border-none">
-                            <Filter className="h-4 w-4 mr-2" />
-                            <SelectValue placeholder="Filtrar por" />
+                            <ArrowUpWideNarrow className="h-4 w-4 mr-2" />
+                            <SelectValue placeholder="Ordenar por" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="categoria">Categoría</SelectItem>
-                            <SelectItem disabled value="0">...</SelectItem>
+                            <SelectItem value="precio">Precio</SelectItem>
+                            <SelectItem value="rating">Rating</SelectItem>
                         </SelectContent>
                         </Select>
                     </div>
@@ -110,35 +150,42 @@ const HomePage = () => {
                     </div>
                     :
                         productsList?.length > 0 ?
-                            <div  className="grid gap-x-2 gap-y-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3"> 
-                            {
-                                productsList?.map((product) => (
-                                    <ProductCard
-                                        nombre={product?.title}
-                                        description={product?.description}
-                                        categoria={product?.category}
-                                        precioBase={product?.price}
-                                        stockTotal={product?.stock}
-                                        descuento={product?.discountPercentage}
-                                        disponiblidad={product?.availabilityStatus}
-                                        rating={product?.rating}
-                                        thumbnail={product?.thumbnail}
-                                        variantes={[]}
-                                        onEdit={()=>{console.log("EDITADO jeje")}}
-                                    />
-                                    
-                                ))
-                            }
-                            <Pagination 
-                                count={totalPages} 
-                                variant="outlined" 
-                                color="secondary" 
-                                page={page}
-                                onChange={handleChange}
-                            />
+                            <div className="grid gap-x-2 gap-y-4">
+                                <div  className="grid gap-x-2 gap-y-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3"> 
+                                {
+                                    productsList?.map((product) => (
+                                        <ProductCard
+                                            nombre={product?.title}
+                                            description={product?.description}
+                                            categoria={product?.category}
+                                            precioBase={product?.price}
+                                            stockTotal={product?.stock}
+                                            descuento={product?.discountPercentage}
+                                            disponiblidad={product?.availabilityStatus}
+                                            rating={product?.rating}
+                                            thumbnail={product?.thumbnail}
+                                            variantes={[]}
+                                            onEdit={()=>{console.log("EDITADO jeje")}}
+                                        />
+                                        
+                                    ))
+                                }
+                                </div>
+                                <Pagination 
+                                    className="mt-5"
+                                    count={totalPages} 
+                                    variant="outlined" 
+                                    color="secondary" 
+                                    page={page}
+                                    onChange={handleChange}
+                                />
                             </div>
                         :
-                            <span className="text-blue-950">PRUEBA</span> 
+                            <div className="container mx-auto">
+                                <div className="flex items-center justify-center w-full">
+                                    <NotDataFound />
+                                </div>
+                            </div>
                 }
             </div>
         </div>
