@@ -28,6 +28,8 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import type { UserCartCardProps} from "@/types/Components"
 import { CapitalizarString } from "@/helpers/TextFormats"
 
+import DetailsButton from '@/components/Buttons/DetailsButton';
+
 const UserCartCard = ({
     nombre,
     email,
@@ -115,7 +117,7 @@ const UserCartCard = ({
                 </Card>
             </CardContent>
             <CardActions sx={{ px: 1.5, pb: 1, pt: 0 }}>
-                <Button 
+                {/* <Button 
                 size="small" 
                 variant="contained" 
                 fullWidth
@@ -127,7 +129,17 @@ const UserCartCard = ({
                 }}
                 >
                  Ver Detalles
-                </Button>
+                </Button> */}
+                <DetailsButton
+                    OnSubmit={(e) => {
+                        onAction();
+                        e.stopPropagation();
+                    }}
+                    Label={"Ver detalles.."}
+                    IsDisabled={false}
+                    marginTop={5}
+                    small={false}
+                />
             </CardActions>
         </Card>
     )

@@ -65,3 +65,10 @@ export interface UserCartCardProps {
   onAction: () => void
   image?: string;
 }
+
+export interface UserDetailsDrawerType {
+  open: boolean,
+  setOpen: (o: boolean) => void,
+  details: any;
+  setDetails: (o: any[]) => void,
+}

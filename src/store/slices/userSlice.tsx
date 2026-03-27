@@ -1,6 +1,6 @@
 import { type StateCreator } from "zustand";
 import { loginAPI } from "@/api/AuthAPI";
-import { getProductsAPI } from "@/api/UsersAPI";
+import { getUsersAPI, getUserDetailsAPI } from "@/api/UsersAPI";
 import type { LoginResponse, GetUsersResponse } from "@/types/User";
 
 export interface UserSlice {
@@ -11,6 +11,10 @@ export interface UserSlice {
   isLoadingGetUsers: boolean;
   getUsersSuccess: string | null | any;
   getUsers: (limit: string, skip: string)  => Promise<{ success: boolean; error?: string }>;
+  getUserDetailsError: string | null | unknown;
+  isLoadingGetUserDetails: boolean;
+  getUserDetailsSuccess: string | null | any;
+  getUserDetails: (id: string)  => Promise<{ success: boolean; error?: string }>;
 }
 
 export const createUserSlice: StateCreator<UserSlice, [], [], UserSlice> = (
@@ -61,7 +65,7 @@ export const createUserSlice: StateCreator<UserSlice, [], [], UserSlice> = (
   getUsers: async (limit: string, skip: string) => {
     set((state: any) => ({ ...state, isLoadingGetUsers: true, getUsersError: null }));
     try {
-      const res = await getProductsAPI(limit, skip);
+      const res = await getUsersAPI(limit, skip);
       console.log(res);
       if (res) {
         set((state) => ({
@@ -76,6 +80,29 @@ export const createUserSlice: StateCreator<UserSlice, [], [], UserSlice> = (
       return { success: false, error: err || 'Error desconocido' };
     } finally {
       set((state: any) => ({ ...state, isLoadingGetUsers: false }));
+    }
+  },
+  getUserDetailsSuccess: null,
+  getUserDetailsError: null,
+  isLoadingGetUserDetails: false,
+  getUserDetails: async (id: string) => {
+    set((state: any) => ({ ...state, isLoadingGetUserDetails: true, getUserDetailsError: null }));
+    try {
+      const res = await getUserDetailsAPI(id);
+      console.log(res);
+      if (res) {
+        set((state) => ({
+          ...state,
+          getUserDetailsError: null,
+          getUserDetailsSuccess: res,
+        }));
+      }
+      return { success: true };
+    } catch (err: any) {
+      set((state: any) => ({ ...state, getUserDetailsError: err || 'Error desconocido' }));
+      return { success: false, error: err || 'Error desconocido' };
+    } finally {
+      set((state: any) => ({ ...state, isLoadingGetUserDetails: false }));
     }
   },
 });

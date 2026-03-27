@@ -29,13 +29,15 @@ import { filtered } from "@/helpers/FilterArray"
 
 import WatingData from "@/components/LottieAnimations/WatingData";
 import NotDataFound from "@/components/LottieAnimations/NotDataFound";
-import UserCartCard from "@/components/Cards/UserCartCard"
+import UserCartCard from "@/components/Cards/UserCartCard";
+import UserDetailsDrawer from "@/components/Drawer/UserDetailsDrawer"
 
 const UsersCarts = () => {
     const { user } = useAuth();
     const { getUsers, isLoadingGetUsers, getUsersError, getUsersSuccess } = useStore();
+    const { getUserDetails, isLoadingGetUserDetails, getUserDetailsError, getUserDetailsSuccess } = useStore();
 
-    const [open, setOpen] = React.useState(false);
+    const [openDrawer, setOpenDrawer] = React.useState(false);
     const [search, setSearch] = useState("");
     const [filterData, setFilterData] = useState<string>("all");
     const debouncedSearchTerm = useDebounce(search, 300);
@@ -48,6 +50,7 @@ const UsersCarts = () => {
     const [skipt, setSkipt] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
     const [searchPlaceholder, setSearchPlaceholder] = useState("Seleccione un filtro...");
+    const [userDetails, setUserDetails] = useState([]);
 
     useEffect(() => {
         if(user?.id && !isLoadingGetUsers){
@@ -82,6 +85,15 @@ const UsersCarts = () => {
             setUsersFullList([]);
         }
     }, [getUsersSuccess]);
+
+    useEffect(() => {
+        if(getUserDetailsSuccess?.data?.carts?.length > 0){
+            setUserDetails(getUserDetailsSuccess?.data?.carts[0]?.products);
+        }else{
+            setUserDetails([]);
+        }
+    }, [getUserDetailsSuccess]);
+
 
     useEffect(() => {
         if(totalDocs > 0){
@@ -130,6 +142,11 @@ const UsersCarts = () => {
         
     };
 
+    const handleGetUserDetail = (ID: string)=> {
+        setOpenDrawer(true);
+        getUserDetails(ID);
+    }
+
     return(
         <div className="p-0 grid grid-cols-1 gap-4">
             <div id="users-page" style={{width:"100%", margin: 0}}>
@@ -175,7 +192,7 @@ const UsersCarts = () => {
                                                 nombre={user?.fullName}
                                                 email={user?.email}
                                                 numeroCarritos={user?.id}
-                                                onAction={()=>{console.log("Show drawer")}}
+                                                onAction={()=>{handleGetUserDetail(user?.id)}}
                                                 //image={user?.image}
                                             />
                                         ))
@@ -198,6 +215,12 @@ const UsersCarts = () => {
                             </div>
                 }
             </div>
+            <UserDetailsDrawer
+                open={openDrawer}
+                setOpen={setOpenDrawer}
+                details={userDetails}
+                setDetails={setUserDetails}
+            />
         </div>
     );
 }
