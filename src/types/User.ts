@@ -10,3 +10,15 @@ export interface LoginResponse {
   message?: string;
   data?: any;
 }
+
+export interface GetUsersResponse {
+  success?: boolean;
+  status?: string;
+  message?: string;
+  data?: any;
+}
+
+export interface GetUsersParams {
+  limit: string;
+  skip: string;
+}

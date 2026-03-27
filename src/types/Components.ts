@@ -56,3 +56,12 @@ export interface SimpleListProps {
   title: string;
   items: any
 }
+
+
+export interface UserCartCardProps {
+  nombre: string;
+  email: string;
+  numeroCarritos: number;
+  onAction: () => void
+  image?: string;
+}

@@ -76,13 +76,13 @@ const HomePage = () => {
         }
     }, [totalDocs]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (IsEmpty(search.trim())) {
             getProductsList(limit?.toString(), "0");
         } else {
             
         }
-    }, [search]); 
+    }, [search]); */
 
     useEffect(() => {
         if (debouncedSearchTerm) {
@@ -161,24 +161,24 @@ const HomePage = () => {
                         productsList?.length > 0 ?
                             <div className="grid gap-x-2 gap-y-4">
                                 <div  className="grid gap-x-2 gap-y-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3"> 
-                                {
-                                    productsList?.map((product) => (
-                                        <ProductCard
-                                            nombre={product?.title}
-                                            description={product?.description}
-                                            categoria={product?.category}
-                                            precioBase={product?.price}
-                                            stockTotal={product?.stock}
-                                            descuento={product?.discountPercentage}
-                                            disponiblidad={product?.availabilityStatus}
-                                            rating={product?.rating}
-                                            thumbnail={product?.thumbnail}
-                                            variantes={[]}
-                                            onEdit={()=>{console.log("EDITADO jeje")}}
-                                        />
-                                        
-                                    ))
-                                }
+                                    {
+                                        productsList?.map((product) => (
+                                            <ProductCard
+                                                nombre={product?.title}
+                                                description={product?.description}
+                                                categoria={product?.category}
+                                                precioBase={product?.price}
+                                                stockTotal={product?.stock}
+                                                descuento={product?.discountPercentage}
+                                                disponiblidad={product?.availabilityStatus}
+                                                rating={product?.rating}
+                                                thumbnail={product?.thumbnail}
+                                                variantes={[]}
+                                                onEdit={()=>{console.log("EDITADO jeje")}}
+                                            />
+                                            
+                                        ))
+                                    }
                                 </div>
                                 <Pagination 
                                     className="mt-5"
