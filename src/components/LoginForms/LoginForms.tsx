@@ -129,6 +129,8 @@ const LoginForms = ()=> {
                         OnSubmit={handleLogin}
                         Label={"Entrar"}
                         IsDisabled={isDisabled}
+                        marginTop={8}
+                        small={false}
                     />
                 </Box>
             </div>

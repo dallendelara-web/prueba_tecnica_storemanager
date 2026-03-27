@@ -24,5 +24,5 @@ export interface ProductsData {
   descuento?: number;
   disponiblidad: "En venta" | "Descontinuado"
   rating?: number;
-  variantes: [ProductsVariantData]
+  variantes: ProductsVariantData[] | any
 }

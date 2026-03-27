@@ -16,6 +16,8 @@ export interface SubmitButtonType {
   Label: string;
   OnSubmit: (value: any) => void;
   IsDisabled: boolean;
+  marginTop: number;
+  small: boolean
 }
 
 export interface FilterComponentProps {
@@ -43,4 +45,14 @@ export interface ProductCardProps {
   rating?: number;
   thumbnail?: string;
   onEdit: () => void
+}
+
+export interface modalType {
+  open: boolean,
+  setOpen: (o: boolean) => void
+}
+
+export interface SimpleListProps {
+  title: string;
+  items: any
 }

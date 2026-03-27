@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LockIcon, LockOpenIcon } from "lucide-react";
+import { LockIcon, LockOpenIcon, XCircle } from "lucide-react";
 import type { SubmitButtonType } from "@/types/Components"
 import {
   Button,
@@ -16,14 +16,13 @@ const SubmitButton = ({
 }: SubmitButtonType)=>{
     return(
         <Button
-            className={IsDisabled ? "submit-button sb-disabled" : "submit-button"}
-            //type="submit"
+            className={IsDisabled ? "cancel-button sb-disabled" : "cancel-button"}
             fullWidth={small ? false : true}
             variant="contained"
             sx={{ mt: {marginTop}, mb: 2 }}
             color="secondary"
             disabled={IsDisabled}
-            startIcon={IsDisabled ? <LockIcon /> : <LockOpenIcon />}
+            startIcon={<XCircle />}
             onClick={OnSubmit}
         >
             {Label ?? "OK"}

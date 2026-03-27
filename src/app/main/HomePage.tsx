@@ -29,11 +29,20 @@ import {
 import WatingData from "@/components/LottieAnimations/WatingData";
 import NotDataFound from "@/components/LottieAnimations/NotDataFound";
 import ProductCard from "@/components/Cards/ProductCard";
+import ProductModal from "@/components/ProductModal/ProductModal";
 
 const HomePage = () => {
     const { user } = useAuth();
     const { getProductsList, isLoadingGetProductsList, getProductsListError, getProductsListSuccess } = useStore();
     const { getProductsByCategory, getProductsByCategoryError, isLoadingGetProductsByCategory } = useStore();
+
+    const [open, setOpen] = React.useState(false);
+    const handleClose = () => {
+        setOpen(false);
+    };
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
     const [productsList, setProductsList] = useState([]);
     const [totalDocs, setTotalDocs] = useState(0);
@@ -113,7 +122,7 @@ const HomePage = () => {
                 <div className="flex gap-x-2">
                     <Button 
                         size="sm" 
-                        //onClick={handleCreateRequest}
+                        onClick={() => setOpen(true)}
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         Nuevo producto
@@ -142,7 +151,7 @@ const HomePage = () => {
             />
             <div id="home-page" style={{width:"100%", margin: 0}} className="grid grid-cols-1 gap-4">
                 {
-                    isLoadingGetProductsList ?
+                    isLoadingGetProductsList || isLoadingGetProductsByCategory?
                     <div className="container mx-auto">
                         <div className="flex items-center justify-center w-full">
                             <WatingData />
@@ -188,6 +197,10 @@ const HomePage = () => {
                             </div>
                 }
             </div>
+            <ProductModal
+                open={open}
+                setOpen={setOpen}
+            />
         </div>
     );
 }
