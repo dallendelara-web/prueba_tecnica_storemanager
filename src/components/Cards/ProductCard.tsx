@@ -24,6 +24,7 @@ import FlagCircleIcon from '@mui/icons-material/FlagCircle';
 
 import type {ProductCardProps} from "@/types/Components"
 import { CapitalizarString } from "@/helpers/TextFormats"
+import { useProductSaved } from "@/Context/ProductSavedContext";
 
 const ProductCard = ({
     nombre,
@@ -38,6 +39,11 @@ const ProductCard = ({
     thumbnail,
     onEdit,
 }: ProductCardProps)=> {
+    const { nombre: Nombresaved } = useProductSaved();
+
+    const se = ()=>{
+        console.log("Nombre guardado: "+ Nombresaved);
+    }
     return (
         <Card 
             sx={{ 
@@ -157,18 +163,6 @@ const ProductCard = ({
                 </Card>
             </CardContent>
             <CardActions sx={{ px: 1.5, pb: 1, pt: 0 }}>
-                <Button 
-                size="small" 
-                variant="contained" 
-                fullWidth
-                sx={{ fontSize: { xs: '0.95rem', sm: '0.7rem' }, py: 0.4 }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    //navigate('/service-details', { state: service });
-                }}
-                >
-                Detalles
-                </Button>
             </CardActions>
         </Card>
     )

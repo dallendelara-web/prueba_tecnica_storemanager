@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useStore } from "@/store/useStore";
 import { useAuth } from "@/Context/AuthContextUser";
 import Swal from 'sweetalert2';
+import Alert from '@mui/material/Alert';
+
+import { useProductSaved } from "@/Context/ProductSavedContext";
 
 import {
   TextField,
@@ -26,6 +29,7 @@ import {
   Switch,
   Badge
 } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
 import {
   ExpandMore as ExpandMoreIcon,
   PostAdd
@@ -63,6 +67,17 @@ const ProductModal = ({
     setOpen
 }: modalType)=> {
     const { user } = useAuth();
+    const { 
+        saveProduct, 
+        nombre: nombreStorage,
+        categoria: categoriaStorage,
+        precioBase: precioStorage,
+        stockTotal: stockStorage,
+        descuento: descuentoStorage,
+        disponiblidad: disponibilidadStorage,
+        rating: ratingStorage,
+        variantes: variantesStorage
+    } = useProductSaved();
 
     const [formDataProduct, setFormDataProduct] = useState<ProductsData>({
         nombre: "",
@@ -93,6 +108,16 @@ const ProductModal = ({
     const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
     const [errorsVariables, setErrorsVariables] = useState<{ [key: string]: boolean }>({});
     const [categoriesList, setCategoriesList] = useState([]);
+    const [isOk, setIsOk] = useState(false);
+
+    const [openChildModal, setOpenChildModal] = React.useState(false);
+    const handleCloseChild = () => { setOpenChildModal(false); };
+
+    const [openSnackBar, setOpenSnackBar] = React.useState(false);
+    const handleCloseSnackBar = () => { setOpenSnackBar(false); };
+
+    const timerRef = useRef(null);
+    const dataRef = useRef(formDataProduct);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setChecked(event.target.checked);
@@ -101,7 +126,25 @@ const ProductModal = ({
 
     useEffect(() => {
         if(user?.id && open){
+            console.log("nombreStorage")
+            console.log(nombreStorage)
+            setFormDataProduct({
+                nombre: nombreStorage,
+                categoria: categoriaStorage,
+                precioBase: precioStorage,
+                stockTotal: stockStorage,
+                descuento: descuentoStorage,
+                disponiblidad: disponibilidadStorage ?? "En venta",
+                rating: ratingStorage,
+                variantes: variantesStorage ?? []
+            })
             getCategoriesProducts();
+            startAutoSave();
+        }else{
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
         }
     }, [open]);
 
@@ -120,6 +163,7 @@ const ProductModal = ({
     
     const handleClose = () => {
         setOpen(false);
+        setOpenChildModal(false);
     };
 
     const validateFields = (field: string, value: any)=>{
@@ -157,7 +201,7 @@ const ProductModal = ({
             const res = precioProducto(value);
             if (!res) return null;
 
-            if((value >= formDataProduct.precioBase && value <= (formDataProduct.precioBase * 3)) || value==""){
+            if((Number(value) <= (Number(formDataProduct.precioBase) * 3)) || value==""){
                 setFormDataVariantProduct({ ...formDataVariantProduct, precioBase: value })
             }else{
                 return null;
@@ -167,7 +211,7 @@ const ProductModal = ({
             const res = stockProducto(value);
             if (!res) return null;
 
-            if(value > formDataProduct.stockTotal){
+            if(Number(value) > Number(formDataProduct.stockTotal)){
                 return;
             }else{
                 console.log(formDataProduct.stockTotal)
@@ -206,6 +250,8 @@ const ProductModal = ({
         return status;
     }
 
+    const sumaVariantsStock = formDataProduct?.variantes?.reduce((acumulador, v) => acumulador + v.stockTotal, 0);
+
     const validateFieldsVariantEmpty = async ()=>{
         const newErrors: { [key: string]: boolean } = {};
         let res = false;
@@ -214,11 +260,11 @@ const ProductModal = ({
             newErrors.name = true;
             res = true;
         }
-        if(IsEmpty(formDataVariantProduct.precioBase) || formDataVariantProduct.precioBase == 0){
+        if(IsEmpty(formDataVariantProduct.precioBase) || formDataVariantProduct.precioBase == 0 || Number(formDataVariantProduct.precioBase < Number(formDataProduct.precioBase))){
             newErrors.precioBase = true;
             res = true;
         }
-        if(IsEmpty(formDataVariantProduct.stockTotal) || formDataVariantProduct.stockTotal == 0){
+        if(IsEmpty(formDataVariantProduct.stockTotal) || formDataVariantProduct.stockTotal == 0 || ( Number(formDataVariantProduct.stockTotal) + Number(sumaVariantsStock) ) > Number(formDataProduct.stockTotal)){
             newErrors.stock = true;
             res = true;
         }
@@ -268,6 +314,10 @@ const ProductModal = ({
         }
     }
 
+    const handleCancel = ()=>{
+        setOpenChildModal(true);
+    }
+
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -279,6 +329,23 @@ const ProductModal = ({
         toast.onmouseleave = Swal.resumeTimer;
         }
     });
+
+    const startAutoSave = () => {
+        // Solo iniciamos si no hay un timer corriendo
+        if (!timerRef.current) {
+            console.log("Auto-guardado iniciado (Primer clic)");
+            
+            timerRef.current = setInterval(() => {
+                saveProduct(dataRef.current);
+                setOpenSnackBar(true);
+                setIsOk(true);
+            }, 30000); // 30 segundos
+        }
+    };
+
+    useEffect(() => {
+        dataRef.current = formDataProduct;
+    }, [formDataProduct]);
 
     return(
         <AnimatePresence mode="wait">
@@ -295,6 +362,7 @@ const ProductModal = ({
                     maxWidth={"md"}
                     scroll="paper"
                     disableEscapeKeyDown 
+                    disableEnforceFocus
                 >
                     <DialogTitle>Datos del producto</DialogTitle>
                     <DialogContent
@@ -531,6 +599,33 @@ const ProductModal = ({
                                 </AccordionDetails>
                             </Accordion>
                         </form>
+                        <Dialog
+                            open={openChildModal}
+                            onClose={handleCloseChild}
+                            aria-labelledby="child-modal-title"
+                            aria-describedby="child-modal-description"
+                        >
+                            <DialogContent>
+                                <Alert variant="outlined" severity="error">
+                                    Al dar clic en el botón, el producto no será creado
+                                </Alert>
+                            </DialogContent>
+                            <DialogActions>
+                                <CancelButton
+                                    OnSubmit={handleClose}
+                                    Label={"Salir sin guardar"}
+                                    IsDisabled={false}
+                                    marginTop={2}
+                                    small={true}
+                                />
+                            </DialogActions>
+                        </Dialog>
+                        <Snackbar
+                            open={openSnackBar}
+                            autoHideDuration={6000}
+                            onClose={handleCloseSnackBar}
+                            message="Formulario guardado con éxito"
+                        />
                     </DialogContent>
                     <DialogActions className="pr-5">
                         <SubmitButton
@@ -541,7 +636,7 @@ const ProductModal = ({
                             small={true}
                         />
                         <CancelButton
-                            OnSubmit={handleClose}
+                            OnSubmit={handleCancel}
                             Label={"Cancelar"}
                             IsDisabled={false}
                             marginTop={2}

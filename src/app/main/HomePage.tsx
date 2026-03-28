@@ -30,9 +30,11 @@ import WatingData from "@/components/LottieAnimations/WatingData";
 import NotDataFound from "@/components/LottieAnimations/NotDataFound";
 import ProductCard from "@/components/Cards/ProductCard";
 import ProductModal from "@/components/ProductModal/ProductModal";
+import { useProductSaved } from "@/Context/ProductSavedContext";
 
 const HomePage = () => {
     const { user } = useAuth();
+    const { nombre } = useProductSaved();
     const { getProductsList, isLoadingGetProductsList, getProductsListError, getProductsListSuccess } = useStore();
     const { getProductsByCategory, getProductsByCategoryError, isLoadingGetProductsByCategory } = useStore();
 

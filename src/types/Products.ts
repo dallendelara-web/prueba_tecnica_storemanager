@@ -22,7 +22,22 @@ export interface ProductsData {
   precioBase: number;
   stockTotal: number;
   descuento?: number;
-  disponiblidad: "En venta" | "Descontinuado"
+  disponiblidad: "En venta" | "Descontinuado" | string
   rating?: number;
   variantes: ProductsVariantData[] | any
+}
+
+export interface ProductsDataContextType {
+  nombre: string;
+  categoria: string;
+  precioBase: number;
+  stockTotal: number;
+  descuento?: number;
+  disponiblidad: "En venta" | "Descontinuado" | string
+  rating?: number;
+  variantes: ProductsVariantData[] | any,
+  saveProduct: (data: any) => Promise<void>;
+  clearProduct: () => void;
+  isLoading: boolean;
+  isSaved: boolean;
 }

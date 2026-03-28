@@ -4,6 +4,7 @@ import './index.css'
 import { RouterProvider } from 'react-router'
 import router from './routes/routes.tsx'
 import { AuthProvider } from './Context/AuthContextUser.tsx'
+import { ProductProvider } from './Context/ProductSavedContext.tsx'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 
 const theme = createTheme({
@@ -21,10 +22,12 @@ const theme = createTheme({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
+    <ProductProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <RouterProvider router={router}/>
       </ThemeProvider>
+    </ProductProvider>
     </AuthProvider>
   </StrictMode>,
 )
